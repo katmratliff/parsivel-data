@@ -2,7 +2,7 @@
 """
 PURPOSE: - import raw OTT Parsivel disdrometer data
          - plots particle size, velocity, & volumetric distributions
-NOTEs:   - USER MUST UPDATE FILENAME/NOZZLE & RESAVE before running
+NOTES:   - USER MUST UPDATE FILENAME/NOZZLE & RESAVE before running
          - Raw data file (*.MIS), 'particle-sizes.txt' & 'velocity-bins.txt'
            must be in same folder as this script
          - plots are placed in a 'figures' subfolder
