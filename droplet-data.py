@@ -4,6 +4,7 @@ PURPOSE: - import raw OTT Parsivel disdrometer data
          - exports .csv file with precip statistics
 NOTES:   - USER MUST UPDATE FILENAME & RESAVE before running
          - Raw data file (*.MIS) must be in same folder as this script
+         - must rename .MIS files to remove periods before extension
          - user can specify number of rows of data to be deleted from stats
          - user can specify volume collected water to calculate % error
          - user can specify tolerance range for excluding outliers
