@@ -20,8 +20,9 @@ FILENAME = 'TEST FILE.MIS'
 # (used to calculate % error)
 vol_collected = 0
 
-# delete first row of data from MIS file from calcs? 1 = yes, 0 = no
-del_rows = 0
+# delete first row(s) of data from MIS file from calcs?
+# number specifies how many rows to remove
+del_rows = 1
 
 # what is your outlier tolerance? i.e., how many standard deviations away
 # from the mean do we keep data (to avoid erroneous parsivel data)
@@ -30,15 +31,43 @@ zscore_tol = 5
 
 mm_to_in = 0.0393701 # converts mm to inches
 
+particle_sizes = np.loadtxt('particle-sizes.txt')
+
 # import and split dataframe
 df = pd.read_csv(FILENAME, header=None)
 if del_rows:
     drop_data = df.iloc[del_rows:, :8]
+    df_spec_raw = df.iloc[del_rows:, 8:1032]
 else:
     drop_data = df.iloc[:, :8]
+    df_spec_raw = df.iloc[:, 8:1032]
+df_spec_raw = df_spec_raw.replace('<SPECTRUM>', 0)
+df_spec_raw = df_spec_raw.fillna(0)
 
 drop_data.columns= ["date", "time", "intensity", "total_precip",
                     "reflectivity", "visibility", "num_particles", "KE"]
+
+# initialize spectral data array
+spectrum = np.zeros([len(df_spec_raw), 32, 32])
+
+# reshape raw spectrum data
+for i in range(0, len(df_spec_raw)):
+    spectrum[i] = df_spec_raw.iloc[i, :].values.reshape(32, 32)
+
+# sum number of droplets per size class for each measurement
+num_drops_per_diam = np.sum(spectrum, axis=1)
+
+# multiply number of dropelets per size class by its size
+weighted_size = num_drops_per_diam * particle_sizes
+
+# calculate average diameter for each period
+avg_diam_overtime = np.divide(np.sum(weighted_size, axis=1),
+                              np.sum(num_drops_per_diam, axis=1))
+
+# calculate average droplet size weighted by diameter over dataset
+# (standard deviation is variation in average diameter over time)
+weighted_avg_diam = np.divide(np.sum(avg_diam_overtime), len(df_spec_raw))
+avg_diam_std = np.std(avg_diam_overtime)
 
 # remove rows where data falls outside tolerated z-score
 # for now, only looking at number of particles to do this
@@ -77,6 +106,8 @@ with open('rainfall_stats.csv', 'w', newline='') as csvfile:
                      intensity_std_inhr])
     precip.writerow(['Number of Particles', num_particles_avg,
                      num_particles_std])
+    precip.writerow(['Weighted Average Diameter [mm]', weighted_avg_diam,
+                     avg_diam_std])
     precip.writerow(['Kinetic Energy', kinetic_energy_avg, kinetic_energy_std])
     if vol_collected:
         precip.writerow([''])
