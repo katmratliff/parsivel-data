@@ -15,7 +15,7 @@ import pandas as pd
 import numpy as np
 import csv
 
-FILENAME = 'TG-1 P = 40PSI t=20min diffuser = 50 phase = 2.MIS'
+FILENAME = 'TEST FILE.MIS'
 
 # amount of water (in mL) collected in bin during test
 # (used to calculate % error)
@@ -35,10 +35,7 @@ mm_to_in = 0.0393701 # converts mm to inches
 particle_sizes = np.loadtxt('particle-sizes.txt')
 
 # import and split dataframe
-df = pd.read_csv(FILENAME, header=None, engine='python')
-# delete rows where spectral data doesn't exist
-df = df.drop(df[df.iloc[:, 8] != '<SPECTRUM>'].index)
-# delete first rows if specified
+df = pd.read_csv(FILENAME, header=None)
 if del_rows:
     drop_data = df.iloc[del_rows:, :8]
     df_spec_raw = df.iloc[del_rows:, 8:1032]
