@@ -18,8 +18,9 @@ import csv
 FILENAME = 'TEST FILE.MIS'
 
 # amount of water (in mL) collected in bin during test
-# (used to calculate % error)
-vol_collected = 0
+# and bin dimensions (used to calculate % error)
+vol_collected = 1000
+bin_dim = 12.25*12.25
 
 # delete first row(s) of data from MIS file from calcs?
 # number specifies how many rows to remove
@@ -96,7 +97,7 @@ kinetic_energy_std = np.std(drop_data.KE, ddof=1)
 
 # collected water stats, conversion done as in excel sheet
 if vol_collected:
-    collected_intensity = (vol_collected * 0.0610237 * 60 / (20*12.25*12.25))
+    collected_intensity = (vol_collected * 0.0610237 * 60 / (20*bin_dim))
     perc_error = np.abs(1 - collected_intensity / intensity_avg_inhr)
 
 # write ouptut to rainfall_stats.csv
@@ -118,4 +119,4 @@ with open('rainfall_stats.csv', 'w', newline='') as csvfile:
         precip.writerow(['Collected Water Statistics'])
         precip.writerow(['Volume (mL)', vol_collected])
         precip.writerow(['Rain Intensity (in/hr)', collected_intensity])
-        precip.writerow(['% Error', "{:.2%}".format(perc_error)])
+        precip.writerow(['Percent Error', "{:.2%}".format(perc_error)])
