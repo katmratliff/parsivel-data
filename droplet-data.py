@@ -19,12 +19,14 @@ FILENAME = 'TEST FILE.MIS'
 
 # amount of water (in mL) collected in bin during test
 # and bin dimensions (used to calculate % error)
-vol_collected = 1000
-bin_dim = 12.25*12.25
+# and collection time for water (min)
+vol_collected = 325
+bin_dim = 9.75*12
+coll_time = 100
 
 # delete first row(s) of data from MIS file from calcs?
 # number specifies how many rows to remove
-del_rows = 1
+del_rows = 0
 
 # what is your outlier tolerance? i.e., how many standard deviations away
 # from the mean do we keep data (to avoid erroneous parsivel data)
@@ -97,7 +99,7 @@ kinetic_energy_std = np.std(drop_data.KE, ddof=1)
 
 # collected water stats, conversion done as in excel sheet
 if vol_collected:
-    collected_intensity = (vol_collected * 0.0610237 * 60 / (20*bin_dim))
+    collected_intensity = (vol_collected * 0.0610237 * 60 / (coll_time*bin_dim))
     perc_error = np.abs(1 - collected_intensity / intensity_avg_inhr)
 
 # write ouptut to rainfall_stats.csv
