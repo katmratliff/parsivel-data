@@ -22,15 +22,15 @@ FILENAME = 'TEST FILE.MIS'
 # and collection time for water (min)
 vol_collected = 325
 bin_dim = 9.75*12
-coll_time = 100
+coll_time = 10
 
 # delete first row(s) of data from MIS file from calcs?
 # number specifies how many rows to remove
-del_top_rows = 3
+del_top_rows = 0
 
 # delete last row(s) of data from MIS file for calcs?
 # number specifies how many rows to remove
-del_bot_rows = 5
+del_bot_rows = 0
 
 # what is your outlier tolerance? i.e., how many standard deviations away
 # from the mean do we keep data (to avoid erroneous parsivel data)
