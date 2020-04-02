@@ -15,7 +15,7 @@ import pandas as pd
 import numpy as np
 import csv
 
-FILENAME = 'AR1-4-1-Bg-12x9.75-1inhr-A.MIS'
+FILENAME = 'TEST FILE.MIS'
 
 # amount of water (in mL) collected in bin during test
 # and bin dimensions (used to calculate % error)
