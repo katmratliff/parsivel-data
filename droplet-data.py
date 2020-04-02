@@ -26,7 +26,11 @@ coll_time = 100
 
 # delete first row(s) of data from MIS file from calcs?
 # number specifies how many rows to remove
-del_rows = 0
+del_top_rows = 3
+
+# delete last row(s) of data from MIS file for calcs?
+# number specifies how many rows to remove
+del_bot_rows = 5
 
 # what is your outlier tolerance? i.e., how many standard deviations away
 # from the mean do we keep data (to avoid erroneous parsivel data)
@@ -39,27 +43,30 @@ particle_sizes = np.loadtxt('particle-sizes.txt')
 
 # import and split dataframe
 df = pd.read_csv(FILENAME, header=None, engine='python')
-# delete rows where spectral data doesn't exist
-df = df.drop(df[df.iloc[:, 8] != '<SPECTRUM>'].index)
-# delete first rows if specified
-if del_rows:
-    drop_data = df.iloc[del_rows:, :8]
-    df_spec_raw = df.iloc[del_rows:, 8:1032]
-else:
-    drop_data = df.iloc[:, :8]
-    df_spec_raw = df.iloc[:, 8:1032]
-df_spec_raw = df_spec_raw.replace('<SPECTRUM>', 0)
-df_spec_raw = df_spec_raw.fillna(0)
 
+# delete number of top and/or bottom rows if specified
+if del_top_rows or del_bot_rows:
+    df = df.iloc[del_top_rows:(len(df)-del_bot_rows)]
+
+# delete remaining rows where spectral data doesn't exist
+df = df.drop(df[df.iloc[:, 8] != '<SPECTRUM>'].index)
+
+# split out droplet data and add column headers
+drop_data = df.iloc[:, :8]
 drop_data.columns= ["date", "time", "intensity", "total_precip",
                     "reflectivity", "visibility", "num_particles", "KE"]
 
+# split out spectral data and fill with zeros as needed
+spec_raw = df.iloc[:, 8:1032]
+spec_raw = spec_raw.replace('<SPECTRUM>', 0)
+spec_raw = spec_raw.fillna(0)
+
 # initialize spectral data array
-spectrum = np.zeros([len(df_spec_raw), 32, 32])
+spectrum = np.zeros([len(spec_raw), 32, 32])
 
 # reshape raw spectrum data
-for i in range(0, len(df_spec_raw)):
-    spectrum[i] = df_spec_raw.iloc[i, :].values.reshape(32, 32)
+for i in range(0, len(spec_raw)):
+    spectrum[i] = spec_raw.iloc[i, :].values.reshape(32, 32)
 
 # sum number of droplets per size class for each measurement
 num_drops_per_diam = np.sum(spectrum, axis=1)
@@ -73,7 +80,7 @@ avg_diam_overtime = np.divide(np.sum(weighted_size, axis=1),
 
 # calculate average droplet size weighted by diameter over dataset
 # (standard deviation is variation in average diameter over time)
-weighted_avg_diam = np.divide(np.sum(avg_diam_overtime), len(df_spec_raw))
+weighted_avg_diam = np.divide(np.sum(avg_diam_overtime), len(spec_raw))
 avg_diam_std = np.std(avg_diam_overtime)
 
 # remove rows where data falls outside tolerated z-score
